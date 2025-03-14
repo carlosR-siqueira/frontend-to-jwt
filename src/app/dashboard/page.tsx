@@ -8,7 +8,7 @@ const API_URL = "http://localhost:3000";
 
 export default function Dashboard() {
   const [user, setUser] = useState<string>(""); // Nome do usuário
-  const [clientes, setClientes] = useState<{ id: number; nome: string }[]>([]);
+  const [users, setUsers] = useState<{ id: number; username: string }[]>([]); // Mudança de 'clientes' para 'users'
   const router = useRouter();
 
   useEffect(() => {
@@ -18,22 +18,22 @@ export default function Dashboard() {
     } else {
       // Decodificando o token JWT para obter o nome do usuário
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      setUser(decodedToken.userName || "Usuário Autenticado");
-      fetchClientes(token);
+      setUser(decodedToken.userName || "Usuário Autenticado"); // Usando o nome do usuário do token
+      fetchUsers(token);
     }
   }, [router]);
 
-  const fetchClientes = async (token: string) => {
-    const response = await fetch(`${API_URL}/clientes`, {
+  const fetchUsers = async (token: string) => {
+    const response = await fetch(`${API_URL}/users`, {
       method: "GET",
       headers: { "x-access-token": token },
     });
 
     if (response.ok) {
       const data = await response.json();
-      setClientes(data);
+      setUsers(data);
     } else {
-      alert("Falha ao buscar clientes");
+      alert("Falha ao buscar usuários");
     }
   };
 
@@ -64,16 +64,16 @@ export default function Dashboard() {
   return (
     <div className={styles.container}>
       <div className={styles.dashboardBox}>
-        <h2 className={styles.welcomeMessage}>Bem-vindo, {user}!</h2>
+        <h2 className={styles.welcomeMessage}>Bem-vindo, {user}!</h2> {/* Exibindo o nome do usuário */}
         <p className={styles.authMessage}>Você está autenticado.</p>
         
-        <h3 className={styles.clientTitle}>Clientes:</h3>
+        <h3 className={styles.clientTitle}>Usuários:</h3>
         <ul className={styles.clientList}>
-          {clientes.map((cliente) => (
-              <li key={cliente.id} className={styles.clientItem}>{cliente.nome}</li>
-              ))}
+          {users.map((user) => (
+              <li key={user.id} className={styles.clientItem}>{user.username}</li>
+          ))}
         </ul>
-              <button className={styles.logoutButton} onClick={logout}>Sair</button>
+        <button className={styles.logoutButton} onClick={logout}>Sair</button>
       </div>
     </div>
   );
